@@ -10,6 +10,7 @@ Candidates for the look of `bdg_retro_menu`. The licenses below are from memory,
 | Pixelify Sans | Modern and readable, with more weights | SIL OFL |
 | Kenney fonts (Kenney Pixel, Kenney Mini) | Simple pixel fonts | CC0 |
 | Print Char 21 / PR Number 3 (Kreative Software) | Apple II text screen. Print Char 21 is the wide 40-column look, PR Number 3 the narrow 80-column look | Kreative Software Relay Fonts Free Use License 1.2f (not OSI-approved, see below) |
+| Hack (Source Foundry) | Smooth monospaced programmer font, not a pixel font. Useful as a contrast and for a terminal look | MIT, plus Bitstream Vera License for the parts derived from Vera Sans Mono |
 
 Also popular in game jams: m5x7 and m6x11 by Daniel Linssen. Their exact terms are unchecked.
 
@@ -32,6 +33,12 @@ Downloaded from <https://www.kreativekorp.com/software/fonts/apple2/> (`pr.zip`)
 This is not an open-source license. The fonts are kept in `demo/fonts/` only and are not bundled inside `addons/`, so users of the addon do not receive them. Check the current terms again before shipping them in a released game or on the Asset Library.
 
 Measured in Godot 4.7.2: at 16px, Print Char 21 advances 14px per character and PR Number 3 advances 7px, so PR Number 3 is exactly half as wide. At 8px, PR Number 3 advances 3.5px, so use sizes that are multiples of 16 to keep glyphs on whole pixels. The demo uses 16.
+
+## Hack
+
+From <https://github.com/source-foundry/Hack> (release v3.003, `Hack-Regular.ttf`). License file: `demo/fonts/LICENSE-Hack.md`, copied from the repository's `LICENSE.md`. Hack is MIT-licensed. The parts derived from Bitstream Vera Sans Mono fall under the Bitstream Vera License, which allows redistribution if the copyright and permission notices are included, and requires a rename if the font is modified. It is unmodified here.
+
+Hack is a smooth font, so the pixel-font advice above does not apply. The demo skips the antialiasing and hinting overrides for it.
 
 ## Shipping
 

@@ -8,6 +8,7 @@ const FONTS := [
 	{"key": KEY_4, "name": "Kenney Pixel", "path": "res://demo/fonts/KenneyPixel.ttf", "size": 16},
 	{"key": KEY_5, "name": "Print Char 21 (Apple II 40-column)", "path": "res://demo/fonts/PrintChar21.ttf", "size": 16},
 	{"key": KEY_6, "name": "PR Number 3 (Apple II 80-column)", "path": "res://demo/fonts/PRNumber3.ttf", "size": 16},
+	{"key": KEY_7, "name": "Hack (smooth, not pixel)", "path": "res://demo/fonts/Hack-Regular.ttf", "size": 16, "smooth": true},
 ]
 
 var _menu: RetroMenu
@@ -19,7 +20,7 @@ func _ready() -> void:
 
 	_label = Label.new()
 	_label.position = Vector2(400, 16)
-	_label.text = "Press 1-6 to change font (Default, Press Start 2P, Silkscreen, Kenney Pixel, Print Char 21, PR Number 3)"
+	_label.text = "Press 1-7 to change font (Default, Press Start 2P, Silkscreen, Kenney Pixel, Print Char 21, PR Number 3, Hack)"
 	add_child(_label)
 
 	_menu = RetroMenu.new()
@@ -47,9 +48,11 @@ func _apply_font(choice: Dictionary) -> void:
 	var menu_theme := Theme.new()
 	if choice.path != "":
 		var font: FontFile = load(choice.path)
-		font.antialiasing = TextServer.FONT_ANTIALIASING_NONE
-		font.hinting = TextServer.HINTING_NONE
-		font.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
+		# Pixel fonts need crisp, unsmoothed rendering; smooth fonts keep Godot's defaults.
+		var smooth: bool = choice.get("smooth", false)
+		font.antialiasing = TextServer.FONT_ANTIALIASING_GRAY if smooth else TextServer.FONT_ANTIALIASING_NONE
+		font.hinting = TextServer.HINTING_LIGHT if smooth else TextServer.HINTING_NONE
+		font.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_AUTO if smooth else TextServer.SUBPIXEL_POSITIONING_DISABLED
 		menu_theme.set_font(&"font", &"RetroMenu", font)
 	menu_theme.set_font_size(&"font_size", &"RetroMenu", choice.size)
 	if choice.has("offset"):

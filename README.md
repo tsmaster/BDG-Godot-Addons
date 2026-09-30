@@ -26,7 +26,7 @@ On a fresh checkout, register the addon's classes once first:
 godot --headless --path . --import
 ```
 
-The demo scene shows the retro menu. Press **1** to **6** to switch between the default font, Press Start 2P, Silkscreen, Kenney Pixel, and the Apple II fonts Print Char 21 and PR Number 3.
+The demo scene shows the retro menu. Press **1** to **7** to switch between the default font, Press Start 2P, Silkscreen, Kenney Pixel, and the Apple II fonts Print Char 21 and PR Number 3, and the smooth programmer font Hack.
 
 ## Using an addon
 
@@ -39,6 +39,7 @@ Copy the addon's folder (for example `addons/bdg_retro_menu/`) into your project
   - Press Start 2P and Silkscreen: SIL Open Font License
   - Kenney Pixel: CC0
   - Print Char 21 and PR Number 3, by Kreative Software: [Relay Fonts Free Use License](demo/fonts/LICENSE-Kreative-PrintChar21-PRNumber3.txt) (free to redistribute unmodified with the license and credit; not open source)
+  - Hack, by the Source Foundry: MIT License, with the Bitstream Vera License for the parts derived from Vera Sans Mono ([license](demo/fonts/LICENSE-Hack.md))
 
 ## License
 
