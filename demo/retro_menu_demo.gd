@@ -13,6 +13,8 @@ var _label: Label
 
 
 func _ready() -> void:
+	_bind_gamepad_cancel()
+
 	_label = Label.new()
 	_label.position = Vector2(400, 16)
 	_label.text = "Press 1-4 to change font (Default, Press Start 2P, Silkscreen, Kenney Pixel)"
@@ -27,6 +29,16 @@ func _ready() -> void:
 
 	_menu.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_menu.open(_build_menu())
+
+
+## The project has no gamepad binding for ui_cancel, so the demo adds the east
+## face button (Xbox B / PlayStation Circle). Real projects should set this in
+## Project Settings > Input Map instead.
+func _bind_gamepad_cancel() -> void:
+	var back := InputEventJoypadButton.new()
+	back.button_index = JOY_BUTTON_B
+	if not InputMap.action_has_event(&"ui_cancel", back):
+		InputMap.action_add_event(&"ui_cancel", back)
 
 
 func _apply_font(choice: Dictionary) -> void:
