@@ -20,7 +20,7 @@ A collection of reusable tools for games built with the Godot game engine.
 - Since the tools may be published, keep each one self-contained and independent of any particular game. Do not hard-code project paths, autoload names or project settings. If a tool needs configuration, expose it through exported properties or a documented API.
 - Asset Library submissions need a standard addon layout: `addons/<addon_name>/` with a `plugin.cfg`. Decide the addon boundaries before adding many tools, because they determine the layout.
 - Stick to GDScript unless there is a concrete reason to leave it.
-- Target Godot 4.7 (the current stable release). Use 4.x GDScript syntax and APIs, and check the 4.7 docs rather than relying on memory of older versions.
+- Target Godot 4.7 (tested with 4.7.2 stable). Use 4.x GDScript syntax and APIs, and check the 4.7 docs rather than relying on memory of older versions.
 
 ## Planned layout (suggestion, not a commitment)
 
@@ -51,10 +51,10 @@ Design is inspired by the retro menu by OneLoneCoder (OLC, javidx9): a cascading
 
 ## Commands
 
-The Godot binary is not on `PATH`. The author's copy is `../GodotEngine/4.7/Godot_v4.7-dev1_linux.x86_64`, relative to the project root (Godot 4.7-dev1).
+The Godot binary is not on `PATH`. The author's copy is `../GodotEngine/4.7/Godot_v4.7.2-stable_linux.x86_64`, relative to the project root (Godot 4.7.2 stable).
 
 ```
-G=../GodotEngine/4.7/Godot_v4.7-dev1_linux.x86_64
+G=../GodotEngine/4.7/Godot_v4.7.2-stable_linux.x86_64
 $G --headless --path . --import            # required once on a fresh checkout, to register class_name globals
 $G --headless --path . --quit-after 120    # load and run the demo headless; script errors go to stderr
 $G --path .                                # run the demo (a gray window means a script error, so check the console)
@@ -62,6 +62,8 @@ $G --editor --path .                       # open the editor
 ```
 
 Without the `--import` pass, a fresh checkout fails with `Could not find type "RetroMenu"`, because `.godot/` (which holds the global class cache) does not exist yet. Headless mode has no renderer, so it cannot show whether drawing is correct.
+
+Also tested with 4.8-dev6 at `../GodotEngine/4.8/Godot_v4.8-dev6_linux.x86_64`. Run the commands above with that binary in place of `$G`.
 
 No test framework or linter is set up yet (candidates: GUT or gdUnit4 for tests, gdtoolkit's `gdlint` and `gdformat` for lint).
 
