@@ -2,8 +2,8 @@ class_name RetroMenu
 extends Control
 ## Old-school cascading panel menu.
 ##
-## Build a tree of RetroMenuItem, call open(root), and listen for item_activated.
-## Controlled with the ui_* input actions and the mouse.
+## Build a tree of RetroMenuItem, call open(root), and listen for
+## item_activated. Controlled with the ui_* input actions and the mouse.
 ##
 ## Styling comes from the theme type "RetroMenu". Supported entries:
 ##   styles:    panel (usually a StyleBoxTexture nine-patch), cursor
@@ -16,8 +16,8 @@ extends Control
 
 ## Emitted when a leaf item is chosen.
 signal item_activated(item: RetroMenuItem)
-## Emitted when a checkbox is toggled, or when a different radio is selected (item is
-## the newly selected one). The menu stays open; read item.checked.
+## Emitted when a checkbox is toggled, or when a different radio is selected
+## (item is the newly selected one). The menu stays open; read item.checked.
 signal item_toggled(item: RetroMenuItem)
 ## Emitted whenever the highlighted item changes.
 signal cursor_moved(item: RetroMenuItem)
@@ -33,8 +33,9 @@ const RADIO_ON := "(x) "
 
 ## Where the first panel's top-left corner sits, in this control's local space.
 @export var panel_origin := Vector2(16, 16)
-## Extra offset of each nested panel relative to its parent, for the cascade look.
-## Overridden by the theme constants panel_offset_x / panel_offset_y when set.
+## Extra offset of each nested panel relative to its parent, for the cascade
+## look. Overridden by the theme constants panel_offset_x / panel_offset_y
+## when set.
 @export var panel_offset := Vector2(16, 16)
 ## Up/down wraps from the last row to the first.
 @export var wrap_around := true
@@ -89,6 +90,7 @@ func current_item() -> RetroMenuItem:
 
 
 # --- input ---------------------------------------------------------------
+
 
 func _gui_input(event: InputEvent) -> void:
 	if _panels.is_empty():
@@ -168,7 +170,9 @@ func _set_cursor(index: int) -> void:
 
 func _scroll(delta_rows: int) -> void:
 	var panel: Dictionary = _panels.back()
-	panel.top_row = clampi(panel.top_row + delta_rows, 0, _row_count(panel) - _visible_rows(panel))
+	panel.top_row = clampi(
+		panel.top_row + delta_rows, 0, _row_count(panel) - _visible_rows(panel)
+	)
 	queue_redraw()
 
 
@@ -216,6 +220,7 @@ func _push_panel(item: RetroMenuItem) -> void:
 
 # --- layout --------------------------------------------------------------
 
+
 func _cursor_item(panel: Dictionary) -> RetroMenuItem:
 	return panel.item.children[panel.cursor]
 
@@ -239,18 +244,48 @@ func _layout(panel_index: int) -> Dictionary:
 	var panel: Dictionary = _panels[panel_index]
 	var font := _font()
 	var font_size := _font_size()
-	var pad := get_theme_constant(&"item_padding", THEME_TYPE) if has_theme_constant(&"item_padding", THEME_TYPE) else 4
+	var pad := (
+		get_theme_constant(&"item_padding", THEME_TYPE)
+		if has_theme_constant(&"item_padding", THEME_TYPE)
+		else 4
+	)
 	var indicator_width := _indicator_width(panel.item, font, font_size)
 	var widest := 0.0
 	for child: RetroMenuItem in panel.item.children:
-		widest = maxf(widest, font.get_string_size(child.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
-	var cell := Vector2(indicator_width + widest + pad * 2 + ARROW_WIDTH, font.get_height(font_size) + pad * 2)
+		widest = maxf(
+			widest,
+			(
+				font
+				. get_string_size(
+					child.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size
+				)
+				. x
+			)
+		)
+	var cell := Vector2(
+		indicator_width + widest + pad * 2 + ARROW_WIDTH,
+		font.get_height(font_size) + pad * 2
+	)
 	var style := _panel_style()
-	var border := Vector2(style.get_margin(SIDE_LEFT), style.get_margin(SIDE_TOP))
-	var content := Vector2(_columns(panel) * cell.x, _visible_rows(panel) * cell.y)
+	var border := Vector2(
+		style.get_margin(SIDE_LEFT), style.get_margin(SIDE_TOP)
+	)
+	var content := Vector2(
+		_columns(panel) * cell.x, _visible_rows(panel) * cell.y
+	)
 	var origin := panel_origin + _panel_offset() * panel_index
 	return {
-		"rect": Rect2(origin, content + border + Vector2(style.get_margin(SIDE_RIGHT), style.get_margin(SIDE_BOTTOM))),
+		"rect":
+		Rect2(
+			origin,
+			(
+				content
+				+ border
+				+ Vector2(
+					style.get_margin(SIDE_RIGHT), style.get_margin(SIDE_BOTTOM)
+				)
+			)
+		),
 		"content_origin": origin + border,
 		"cell": cell,
 		"pad": pad,
@@ -273,7 +308,16 @@ func _indicator_width(item: RetroMenuItem, font: Font, font_size: int) -> float:
 	if has_radio:
 		strings.append_array([RADIO_OFF, RADIO_ON])
 	for text in strings:
-		widest = maxf(widest, font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
+		widest = maxf(
+			widest,
+			(
+				font
+				. get_string_size(
+					text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size
+				)
+				. x
+			)
+		)
 	return widest
 
 
@@ -308,6 +352,7 @@ func _cell_at(point: Vector2) -> int:
 
 # --- drawing -------------------------------------------------------------
 
+
 func _draw() -> void:
 	for i in _panels.size():
 		_draw_panel(i, i == _panels.size() - 1)
@@ -329,21 +374,55 @@ func _draw_panel(panel_index: int, is_top: bool) -> void:
 			if index >= children.size():
 				break
 			var child := children[index]
-			var cell_pos: Vector2 = layout.content_origin + Vector2(col * layout.cell.x, row * layout.cell.y)
+			var cell_pos: Vector2 = (
+				layout.content_origin
+				+ Vector2(col * layout.cell.x, row * layout.cell.y)
+			)
 			if index == panel.cursor:
 				draw_style_box(_cursor_style(), Rect2(cell_pos, layout.cell))
 				# Dim the cursor on parent panels so the active panel stands out.
 				if not is_top:
-					draw_rect(Rect2(cell_pos, layout.cell), Color(0, 0, 0, 0.35))
-			var color := _color(&"font_color" if child.enabled else &"font_disabled_color")
-			var baseline := cell_pos + Vector2(layout.pad, layout.pad + font.get_ascent(font_size))
+					draw_rect(
+						Rect2(cell_pos, layout.cell), Color(0, 0, 0, 0.35)
+					)
+			var color := _color(
+				&"font_color" if child.enabled else &"font_disabled_color"
+			)
+			var baseline := (
+				cell_pos
+				+ Vector2(layout.pad, layout.pad + font.get_ascent(font_size))
+			)
 			var indicator := _indicator_text(child)
 			if indicator != "":
-				draw_string(font, baseline, indicator, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+				draw_string(
+					font,
+					baseline,
+					indicator,
+					HORIZONTAL_ALIGNMENT_LEFT,
+					-1,
+					font_size,
+					color
+				)
 			baseline.x += layout.indicator_width
-			draw_string(font, baseline, child.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+			draw_string(
+				font,
+				baseline,
+				child.text,
+				HORIZONTAL_ALIGNMENT_LEFT,
+				-1,
+				font_size,
+				color
+			)
 			if child.is_submenu():
-				_draw_arrow(cell_pos + Vector2(layout.cell.x - ARROW_WIDTH, layout.cell.y * 0.5), Vector2.RIGHT)
+				_draw_arrow(
+					(
+						cell_pos
+						+ Vector2(
+							layout.cell.x - ARROW_WIDTH, layout.cell.y * 0.5
+						)
+					),
+					Vector2.RIGHT
+				)
 
 	# Scroll indicators sit on the right edge of the panel.
 	var edge_x: float = layout.rect.end.x - ARROW_WIDTH
@@ -353,18 +432,22 @@ func _draw_panel(panel_index: int, is_top: bool) -> void:
 		_draw_arrow(Vector2(edge_x, layout.rect.end.y - 6), Vector2.DOWN)
 
 
-## Draws a small filled triangle centered on `center`, pointing along `direction`.
+## Draws a small filled triangle centered on `center`, pointing along
+## `direction`.
 func _draw_arrow(center: Vector2, direction: Vector2) -> void:
 	var side := direction.orthogonal()
-	var points := PackedVector2Array([
-		center + direction * 4.0,
-		center - direction * 3.0 + side * 4.0,
-		center - direction * 3.0 - side * 4.0,
-	])
+	var points := PackedVector2Array(
+		[
+			center + direction * 4.0,
+			center - direction * 3.0 + side * 4.0,
+			center - direction * 3.0 - side * 4.0,
+		]
+	)
 	draw_colored_polygon(points, _color(&"arrow_color"))
 
 
 # --- theme lookups with built-in fallbacks -------------------------------
+
 
 func _panel_offset() -> Vector2:
 	var offset := panel_offset

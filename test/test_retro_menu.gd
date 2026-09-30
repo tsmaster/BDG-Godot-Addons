@@ -1,3 +1,4 @@
+# gdlint: disable=max-public-methods
 extends GdUnitTestSuite
 
 enum Action { ATTACK, DEFEND, RUN }
@@ -17,9 +18,15 @@ func before_test() -> void:
 	closed_count = 0
 	menu = auto_free(RetroMenu.new())
 	add_child(menu)
-	menu.item_activated.connect(func(item: RetroMenuItem) -> void: activated.append(item))
-	menu.item_toggled.connect(func(item: RetroMenuItem) -> void: toggled.append(item))
-	menu.cursor_moved.connect(func(item: RetroMenuItem) -> void: moved.append(item))
+	menu.item_activated.connect(
+		func(item: RetroMenuItem) -> void: activated.append(item)
+	)
+	menu.item_toggled.connect(
+		func(item: RetroMenuItem) -> void: toggled.append(item)
+	)
+	menu.cursor_moved.connect(
+		func(item: RetroMenuItem) -> void: moved.append(item)
+	)
 	menu.closed.connect(func() -> void: closed_count += 1)
 
 
@@ -165,7 +172,7 @@ func test_partial_last_row_clamps_the_cursor() -> void:
 	var root := RetroMenuItem.new("main")
 	var grid := root.add_submenu("Grid", 3)
 	var cells: Array[RetroMenuItem] = []
-	for i in 5:   # rows: 3 + 2, so column 2 of the last row is empty
+	for i in 5:  # rows: 3 + 2, so column 2 of the last row is empty
 		cells.append(grid.add_item("Cell %d" % i))
 	menu.open(root)
 	_press(&"ui_accept")
