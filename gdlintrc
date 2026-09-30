@@ -1,0 +1,4 @@
+# gdlint configuration (gdtoolkit). Only overrides of the defaults are listed.
+# Keep max-line-length in step with the --line-length passed to gdformat.
+# Lint our own folders by name; do not lint "." because it includes addons/gdUnit4.
+max-line-length: 80

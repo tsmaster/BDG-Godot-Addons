@@ -9,5 +9,5 @@
 - [ ] Consider a per-item `activated` signal (or an optional `Callable`) on `RetroMenuItem`, so simple menus can be wired without one big `item_activated` handler, for example `root.add_item("Attack", Action.ATTACK).activated.connect(attack)`. Deferred for now to avoid two ways of doing the same thing.
 - [x] Add radio-button items: `RetroMenuItem.Type.RADIO`, `group` (int, siblings only), `add_radio()`, `select_radio()`, `get_selected_radio()`, drawn as `( )` and `(x)`, sharing the checkbox behavior and the `item_toggled` signal.
 
-- [ ] Choose a linter or formatter (gdtoolkit's `gdlint` and `gdformat`) and document the commands in `CLAUDE.md`.
+- [x] Linter and formatter: gdtoolkit (`gdlint`, `gdformat`) with an 80-character limit; commands are in `CLAUDE.md`.
 - [ ] Check gdUnit4 (or a newer release) against Godot 4.8 once it is stable, and re-run the suite on 4.8-dev builds.

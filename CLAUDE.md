@@ -81,7 +81,16 @@ The command line can run one suite, but as far as I found it has no option to ru
 
 Do the `--import` step above first on a fresh checkout. Exit code 0 means every test passed, and 100 means failures. Reports are written to `reports/`, which is git-ignored. `.gitattributes` marks `addons/gdUnit4` and `test/` as `export-ignore`, so they stay out of `git archive` downloads. gdUnit4 v6.2.1 lists support for Godot 4.5 to 4.7.1, and it has not been checked against 4.7.2 (it worked here) or 4.8.
 
-No linter is set up yet (candidates: gdtoolkit's `gdlint` and `gdformat`).
+### Lint and format
+
+gdtoolkit (`gdlint` and `gdformat`, version 4.5.0 tested) checks our scripts. It is a Python tool that is not vendored: install it with `pipx install gdtoolkit`. Run both from the project root on our own folders only, because `gdlint .` would also lint the vendored `addons/gdUnit4`:
+
+```
+gdformat --line-length 80 addons/bdg_retro_menu demo test   # add --check to only report
+gdlint addons/bdg_retro_menu demo test                      # settings are in gdlintrc
+```
+
+The line limit is 80 characters. It is set in `gdlintrc` (`max-line-length`) and, separately, by the `--line-length 80` option to `gdformat`, so keep the two in step. `gdformat` does not wrap comments, so long comment lines have to be wrapped by hand. The test suite disables `max-public-methods` with a `# gdlint: disable=max-public-methods` comment on its first line.
 
 ## Architecture
 
