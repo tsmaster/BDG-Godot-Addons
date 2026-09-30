@@ -1,7 +1,10 @@
 extends Control
 
 ## Ids for the menu items. The menu itself only sees ints.
-enum Action { ATTACK, DEFEND, CAST, ITEMS, RUN, MUSIC, SOUND, FULLSCREEN }
+enum Action { ATTACK, DEFEND, CAST, ITEMS, RUN, MUSIC, SOUND, FULLSCREEN, EASY, NORMAL, HARD }
+
+## Radio groups.
+enum Group { DIFFICULTY }
 
 ## Font choices for comparison. Pixel fonts look sharpest at multiples of their design size.
 const FONTS := [
@@ -33,7 +36,10 @@ func _ready() -> void:
 	_menu.item_activated.connect(func(item: RetroMenuItem) -> void:
 		_on_item_activated(item))
 	_menu.item_toggled.connect(func(item: RetroMenuItem) -> void:
-		_label.text = "%s is now %s" % [item.text, "on" if item.checked else "off"])
+		if item.type == RetroMenuItem.Type.RADIO:
+			_label.text = "Difficulty: %s" % item.text
+		else:
+			_label.text = "%s is now %s" % [item.text, "on" if item.checked else "off"])
 	_menu.closed.connect(func() -> void: _label.text += "  [closed - press Enter to reopen]")
 
 	_menu.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -111,5 +117,9 @@ func _build_menu() -> RetroMenuItem:
 	settings.add_checkbox("Music", true, Action.MUSIC)
 	settings.add_checkbox("Sound effects", true, Action.SOUND)
 	settings.add_checkbox("Fullscreen", false, Action.FULLSCREEN)
+	var difficulty := root.add_submenu("Difficulty")
+	difficulty.add_radio("Easy", Group.DIFFICULTY, false, Action.EASY)
+	difficulty.add_radio("Normal", Group.DIFFICULTY, true, Action.NORMAL)
+	difficulty.add_radio("Hard", Group.DIFFICULTY, false, Action.HARD)
 	root.add_item("Run", Action.RUN)
 	return root

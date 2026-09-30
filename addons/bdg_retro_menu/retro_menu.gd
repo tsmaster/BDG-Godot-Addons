@@ -16,7 +16,8 @@ extends Control
 
 ## Emitted when a leaf item is chosen.
 signal item_activated(item: RetroMenuItem)
-## Emitted when a checkbox item is toggled. The menu stays open; read item.checked.
+## Emitted when a checkbox is toggled, or when a different radio is selected (item is
+## the newly selected one). The menu stays open; read item.checked.
 signal item_toggled(item: RetroMenuItem)
 ## Emitted whenever the highlighted item changes.
 signal cursor_moved(item: RetroMenuItem)
@@ -27,6 +28,8 @@ const THEME_TYPE := &"RetroMenu"
 const ARROW_WIDTH := 10.0
 const CHECKBOX_OFF := "[ ] "
 const CHECKBOX_ON := "[x] "
+const RADIO_OFF := "( ) "
+const RADIO_ON := "(x) "
 
 ## Where the first panel's top-left corner sits, in this control's local space.
 @export var panel_origin := Vector2(16, 16)
@@ -179,7 +182,7 @@ func _scroll_to_cursor(panel: Dictionary) -> void:
 
 
 ## `from_right` is true when triggered by ui_right, which opens submenus and
-## activates plain items but never flips a checkbox.
+## activates plain items but never flips a checkbox or radio.
 func _activate_current(from_right := false) -> void:
 	var item := current_item()
 	if item == null or not item.enabled:
@@ -187,6 +190,13 @@ func _activate_current(from_right := false) -> void:
 	if item.type == RetroMenuItem.Type.CHECKBOX:
 		if not from_right:
 			item.checked = not item.checked
+			queue_redraw()
+			item_toggled.emit(item)
+	elif item.type == RetroMenuItem.Type.RADIO:
+		# Radios can't be switched off by choosing them again.
+		if not from_right and not item.checked:
+			var panel: Dictionary = _panels.back()
+			panel.item.select_radio(item)
 			queue_redraw()
 			item_toggled.emit(item)
 	elif item.is_submenu():
@@ -248,15 +258,33 @@ func _layout(panel_index: int) -> Dictionary:
 	}
 
 
-## Room reserved before the text of every row when any child is a checkbox, so
-## the labels line up. It fits the wider of "[ ] " and "[x] ".
+## Room reserved before the text of every row when any child is a checkbox or
+## radio, so the labels line up. It fits the widest indicator string in use.
 func _indicator_width(item: RetroMenuItem, font: Font, font_size: int) -> float:
+	var has_checkbox := false
+	var has_radio := false
 	for child: RetroMenuItem in item.children:
-		if child.type == RetroMenuItem.Type.CHECKBOX:
-			return maxf(
-				font.get_string_size(CHECKBOX_OFF, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x,
-				font.get_string_size(CHECKBOX_ON, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
-	return 0.0
+		has_checkbox = has_checkbox or child.type == RetroMenuItem.Type.CHECKBOX
+		has_radio = has_radio or child.type == RetroMenuItem.Type.RADIO
+	var widest := 0.0
+	var strings: Array[String] = []
+	if has_checkbox:
+		strings.append_array([CHECKBOX_OFF, CHECKBOX_ON])
+	if has_radio:
+		strings.append_array([RADIO_OFF, RADIO_ON])
+	for text in strings:
+		widest = maxf(widest, font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
+	return widest
+
+
+## The "[x] " style prefix for a checkbox or radio, or "" for other items.
+func _indicator_text(item: RetroMenuItem) -> String:
+	match item.type:
+		RetroMenuItem.Type.CHECKBOX:
+			return CHECKBOX_ON if item.checked else CHECKBOX_OFF
+		RetroMenuItem.Type.RADIO:
+			return RADIO_ON if item.checked else RADIO_OFF
+	return ""
 
 
 func _top_rect() -> Rect2:
@@ -309,8 +337,8 @@ func _draw_panel(panel_index: int, is_top: bool) -> void:
 					draw_rect(Rect2(cell_pos, layout.cell), Color(0, 0, 0, 0.35))
 			var color := _color(&"font_color" if child.enabled else &"font_disabled_color")
 			var baseline := cell_pos + Vector2(layout.pad, layout.pad + font.get_ascent(font_size))
-			if child.type == RetroMenuItem.Type.CHECKBOX:
-				var indicator := CHECKBOX_ON if child.checked else CHECKBOX_OFF
+			var indicator := _indicator_text(child)
+			if indicator != "":
 				draw_string(font, baseline, indicator, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
 			baseline.x += layout.indicator_width
 			draw_string(font, baseline, child.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
