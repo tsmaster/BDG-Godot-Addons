@@ -66,7 +66,22 @@ Without the `--import` pass, a fresh checkout fails with `Could not find type "R
 
 Also tested with 4.8-dev6 at `../GodotEngine/4.8/Godot_v4.8-dev6_linux.x86_64`. Run the commands above with that binary in place of `$G`.
 
-No test framework or linter is set up yet (candidates: GUT or gdUnit4 for tests, gdtoolkit's `gdlint` and `gdformat` for lint).
+### Tests
+
+Tests use gdUnit4 v6.2.1 (MIT, `addons/gdUnit4/`, the repo moved to `godot-gdunit-labs/gdUnit4`), and suites live in `test/`. Each suite extends `GdUnitTestSuite`. Menu tests send `ui_*` actions to the menu with `get_viewport().push_input()`.
+
+```
+export GODOT_BIN=../GodotEngine/4.7/Godot_v4.7.2-stable_linux.x86_64   # run once per shell
+bash addons/gdUnit4/runtest.sh -a res://test                           # all suites
+bash addons/gdUnit4/runtest.sh -a res://test/test_retro_menu.gd        # one suite
+bash addons/gdUnit4/runtest.sh -a res://test -i res://test/test_retro_menu.gd:test_name   # skip one test or suite (-i means ignore)
+```
+
+The command line can run one suite, but as far as I found it has no option to run a single test. Use `-i` to skip tests instead, or run a single test from the editor's gdUnit4 panel.
+
+Do the `--import` step above first on a fresh checkout. Exit code 0 means every test passed, and 100 means failures. Reports are written to `reports/`, which is git-ignored. `.gitattributes` marks `addons/gdUnit4` and `test/` as `export-ignore`, so they stay out of `git archive` downloads. gdUnit4 v6.2.1 lists support for Godot 4.5 to 4.7.1, and it has not been checked against 4.7.2 (it worked here) or 4.8.
+
+No linter is set up yet (candidates: gdtoolkit's `gdlint` and `gdformat`).
 
 ## Architecture
 

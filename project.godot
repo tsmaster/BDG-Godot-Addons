@@ -12,4 +12,4 @@ config/features=PackedStringArray("4.7")
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/bdg_retro_menu/plugin.cfg")
+enabled=PackedStringArray("res://addons/bdg_retro_menu/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")

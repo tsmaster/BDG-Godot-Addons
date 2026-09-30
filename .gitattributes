@@ -1,0 +1,4 @@
+# Keep the test framework and tests out of "git archive" downloads (for example GitHub zips),
+# so only the addons themselves are distributed.
+addons/gdUnit4 export-ignore
+test export-ignore
