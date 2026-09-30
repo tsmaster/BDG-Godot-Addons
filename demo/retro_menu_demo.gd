@@ -6,6 +6,8 @@ const FONTS := [
 	{"key": KEY_2, "name": "Press Start 2P", "path": "res://demo/fonts/PressStart2P-Regular.ttf", "size": 16, "offset": Vector2i(32, 32)},
 	{"key": KEY_3, "name": "Silkscreen", "path": "res://demo/fonts/Silkscreen-Regular.ttf", "size": 16},
 	{"key": KEY_4, "name": "Kenney Pixel", "path": "res://demo/fonts/KenneyPixel.ttf", "size": 16},
+	{"key": KEY_5, "name": "Print Char 21 (Apple II 40-column)", "path": "res://demo/fonts/PrintChar21.ttf", "size": 16},
+	{"key": KEY_6, "name": "PR Number 3 (Apple II 80-column)", "path": "res://demo/fonts/PRNumber3.ttf", "size": 16},
 ]
 
 var _menu: RetroMenu
@@ -17,7 +19,7 @@ func _ready() -> void:
 
 	_label = Label.new()
 	_label.position = Vector2(400, 16)
-	_label.text = "Press 1-4 to change font (Default, Press Start 2P, Silkscreen, Kenney Pixel)"
+	_label.text = "Press 1-6 to change font (Default, Press Start 2P, Silkscreen, Kenney Pixel, Print Char 21, PR Number 3)"
 	add_child(_label)
 
 	_menu = RetroMenu.new()

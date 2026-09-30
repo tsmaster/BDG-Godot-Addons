@@ -46,7 +46,7 @@ Design is inspired by the retro menu by OneLoneCoder (OLC, javidx9): a cascading
 - `RetroMenu` (`Control`) holds the panel stack, draws everything in `_draw()`, and emits `item_activated`, `cursor_moved` and `closed`.
 - Input: the built-in `ui_*` actions (keyboard and gamepad) plus mouse hover, click, right-click for back, and wheel scroll. The addon defines no input actions of its own.
 - Styling comes from the theme type `RetroMenu` (`panel` and `cursor` styleboxes, `font`, `font_size`, colors, and the `item_padding` constant). The fallback panel texture is generated in code, so the addon ships no binary assets. User-supplied textures and fonts should go through a Theme.
-- Font candidates and pixel-font setup notes are in `docs/retro_fonts.md`. The demo includes Press Start 2P and Silkscreen (SIL OFL) and Kenney Pixel (CC0) under `demo/fonts/`, each with its license file.
+- Font candidates and pixel-font setup notes are in `docs/retro_fonts.md`. The demo includes Press Start 2P and Silkscreen (SIL OFL), Kenney Pixel (CC0), and Kreative Software's Print Char 21 and PR Number 3 (a restrictive free-use license: no modification, no sale, credit required) under `demo/fonts/`, each with its license file. Keep fonts out of `addons/` unless their license permits shipping them with the addon.
 - `demo/` holds a runnable demo scene that is the project's main scene. It is outside `addons/` so it is not shipped with the addon.
 
 ## Commands
