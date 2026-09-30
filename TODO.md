@@ -11,3 +11,6 @@
 
 - [x] Linter and formatter: gdtoolkit (`gdlint`, `gdformat`) with an 80-character limit; commands are in `CLAUDE.md`.
 - [ ] Check gdUnit4 (or a newer release) against Godot 4.8 once it is stable, and re-run the suite on 4.8-dev builds.
+- [ ] Consider a way to hold several child contexts at once. `replace_child()` manages a single slot; a context can hold more children by hand, and teardown already handles them, but there is no mounting helper for them.
+- [ ] Consider letting `tear_down()` be awaitable (for exit transitions). Only `setup()` may await today.
+- [ ] Test `bdg_context` under Godot 4.8-dev builds along with the rest.

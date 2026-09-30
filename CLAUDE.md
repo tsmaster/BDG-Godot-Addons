@@ -50,6 +50,16 @@ Design is inspired by the retro menu by OneLoneCoder (OLC, javidx9): a cascading
 - Font candidates and pixel-font setup notes are in `docs/retro_fonts.md`. The demo includes Press Start 2P and Silkscreen (SIL OFL), Kenney Pixel (CC0), and Kreative Software's Print Char 21 and PR Number 3 (a restrictive free-use license: no modification, no sale, credit required) and Hack (MIT / Bitstream Vera, a smooth font) under `demo/fonts/`, each with its license file. Keep fonts out of `addons/` unless their license permits shipping them with the addon.
 - `demo/` holds a runnable demo scene that is the project's main scene. It is outside `addons/` so it is not shipped with the addon.
 
+## bdg_context
+
+Scoped contexts, based on Hovering Skull's pattern (<https://youtu.be/HkjOE4FbrXo>; credit belongs in the docs). Design decisions are in `docs/context_design.md` and the author's notes are in `docs/godot_context_notes.md`.
+
+- `Context` (`Node`) has virtual `build()`, `setup()` (may `await`) and `tear_down()`, a `state`, and helpers `start()`, `replace_child(ctx, bind)`, `unmount_child()` and `get_child_context()`.
+- `bind_dependencies()` is deliberately not declared on `Context`. Each subclass declares its own typed version, because GDScript rejects an override with a different signature. The parent calls it from the `bind` callable passed to `replace_child()`.
+- No service registry and no automatic injection: the parent passes dependencies explicitly.
+- `replace_child()` refuses an overlapping mount (logs an error, returns `false`) and returns `false` if the child was torn down during `setup()`. Tests for refusals use gdUnit4's `assert_error(...).is_push_error(...)`.
+- Demo: `demo/context/` (run with `res://demo/context/context_demo.tscn`). `DemoRoot` mounts `DemoSplash` (its `setup()` awaits a fake load), then `DemoMainMenu`, then a mode or settings screen. Tests in `test/test_context.gd` and `test/test_demo_context.gd`.
+
 ## Commands
 
 The Godot binary is not on `PATH`. The author's copy is `../GodotEngine/4.7/Godot_v4.7.2-stable_linux.x86_64`, relative to the project root (Godot 4.7.2 stable).
@@ -86,8 +96,8 @@ Do the `--import` step above first on a fresh checkout. Exit code 0 means every 
 gdtoolkit (`gdlint` and `gdformat`, version 4.5.0 tested) checks our scripts. It is a Python tool that is not vendored: install it with `pipx install gdtoolkit`. Run both from the project root on our own folders only, because `gdlint .` would also lint the vendored `addons/gdUnit4`:
 
 ```
-gdformat --line-length 80 addons/bdg_retro_menu demo test   # add --check to only report
-gdlint addons/bdg_retro_menu demo test                      # settings are in gdlintrc
+gdformat --line-length 80 addons/bdg_context addons/bdg_retro_menu demo test   # add --check to only report
+gdlint addons/bdg_context addons/bdg_retro_menu demo test                      # settings are in gdlintrc
 ```
 
 The line limit is 80 characters. It is set in `gdlintrc` (`max-line-length`) and, separately, by the `--line-length 80` option to `gdformat`, so keep the two in step. `gdformat` does not wrap comments, so long comment lines have to be wrapped by hand. The test suite disables `max-public-methods` with a `# gdlint: disable=max-public-methods` comment on its first line.
