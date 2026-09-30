@@ -16,6 +16,10 @@ The mouse also works: hover to highlight, left-click to choose, right-click or c
 
 **Gamepad:** in the author's project (Godot 4.7.2) the gamepad B button was not bound to `ui_cancel`, so it did nothing. If back does not work on your controller, bind a button to `ui_cancel` in Project Settings > Input Map. The demo does this in code for the east face button (Xbox B / PlayStation Circle).
 
+## Fonts and styling
+
+By default the menu uses Godot's built-in fallback font (`ThemeDB.fallback_font`), so the addon ships no font files. To change the look, assign a Theme with the type `RetroMenu` to the menu. It reads `font`, `font_size`, colors, the `panel` and `cursor` styleboxes, and the constants `item_padding`, `panel_offset_x` and `panel_offset_y`. The demo shows several pixel fonts this way.
+
 ## Credits
 
 The design is inspired by the retro pop-up menu system by **OneLoneCoder** (javidx9):
