@@ -42,7 +42,7 @@ Design is inspired by the retro menu by OneLoneCoder (OLC, javidx9): a cascading
 - Video: <https://youtu.be/jde1Jq5dF0E>
 - Source: <https://github.com/OneLoneCoder/Javidx9/blob/master/PixelGameEngine/SmallerProjects/OneLoneCoder_PGE_RetroMenu.cpp>
 
-- `RetroMenuItem` (`Resource`) is the data tree. An item with children is a submenu, and its `columns` and `max_visible_rows` set the panel layout.
+- `RetroMenuItem` (`Resource`) is the data tree. Game code identifies items by `id` (an int, meant to hold a game-defined enum member) and can attach any value in `metadata`. An item with children is a submenu, and its `columns` and `max_visible_rows` set the panel layout.
 - `RetroMenu` (`Control`) holds the panel stack, draws everything in `_draw()`, and emits `item_activated`, `cursor_moved` and `closed`.
 - Input: the built-in `ui_*` actions (keyboard and gamepad) plus mouse hover, click, right-click for back, and wheel scroll. The addon defines no input actions of its own.
 - Styling comes from the theme type `RetroMenu` (`panel` and `cursor` styleboxes, `font`, `font_size`, colors, and the `item_padding` constant). The fallback panel texture is generated in code, so the addon ships no binary assets. User-supplied textures and fonts should go through a Theme.

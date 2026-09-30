@@ -3,8 +3,13 @@ extends Resource
 ## One entry in a RetroMenu. An item with children is a submenu.
 
 @export var text := ""
-## Free-form value for identifying the item in the item_activated signal.
+## Identifies the item in the item_activated signal. An enum member from your own
+## game works well: enum values are ints, so `add_item("Attack", Action.ATTACK)`
+## can be matched later with `match item.id: Action.ATTACK: ...`.
 @export var id := -1
+## Anything your game wants to carry with the item, such as a spell resource or an
+## inventory slot. The menu never reads it.
+@export var metadata: Variant = null
 ## Disabled items are drawn greyed out and cannot be activated.
 @export var enabled := true
 ## Grid columns used when this item's children are shown as a panel.

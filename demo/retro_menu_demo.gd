@@ -1,5 +1,8 @@
 extends Control
 
+## Ids for the menu items. The menu itself only sees ints.
+enum Action { ATTACK, DEFEND, CAST, ITEMS, RUN }
+
 ## Font choices for comparison. Pixel fonts look sharpest at multiples of their design size.
 const FONTS := [
 	{"key": KEY_1, "name": "Default", "path": "", "size": 16},
@@ -27,11 +30,21 @@ func _ready() -> void:
 	_menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_menu)
 	_menu.item_activated.connect(func(item: RetroMenuItem) -> void:
-		_label.text = "Chose: %s (id %d)" % [item.text, item.id])
+		_on_item_activated(item))
 	_menu.closed.connect(func() -> void: _label.text += "  [closed - press Enter to reopen]")
 
 	_menu.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_menu.open(_build_menu())
+
+
+func _on_item_activated(item: RetroMenuItem) -> void:
+	match item.id:
+		Action.CAST:
+			# The spell data travels with the item in its metadata.
+			var spell: Dictionary = item.metadata
+			_label.text = "Cast %s (costs %d MP)" % [spell.name, spell.mp]
+		_:
+			_label.text = "Chose: %s (%s)" % [item.text, Action.find_key(item.id)]
 
 
 ## The project has no gamepad binding for ui_cancel, so the demo adds the east
@@ -75,16 +88,20 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _build_menu() -> RetroMenuItem:
 	var root := RetroMenuItem.new("main")
-	root.add_item("Attack", 101)
-	root.add_item("Defend", 102)
+	root.add_item("Attack", Action.ATTACK)
+	root.add_item("Defend", Action.DEFEND)
 	var magic := root.add_submenu("Magic")
 	var white := magic.add_submenu("White", 3, 4)
-	for spell in ["Cure", "Cura", "Curaga", "Raise", "Esuna", "Protect", "Shell", "Regen", "Holy"]:
-		white.add_item(spell)
+	var white_spells := [
+		{"name": "Cure", "mp": 4}, {"name": "Cura", "mp": 9}, {"name": "Curaga", "mp": 20},
+		{"name": "Raise", "mp": 12}, {"name": "Esuna", "mp": 6}, {"name": "Protect", "mp": 5},
+		{"name": "Shell", "mp": 5}, {"name": "Regen", "mp": 8}, {"name": "Holy", "mp": 30},
+	]
+	for spell in white_spells:
+		white.add_item(spell.name, Action.CAST).metadata = spell
 	var black := magic.add_submenu("Black")
-	for spell in ["Fire", "Blizzard", "Thunder"]:
-		black.add_item(spell)
-	var items := root.add_item("Items", 103)
-	items.enabled = false
-	root.add_item("Run", 104)
+	for spell in [{"name": "Fire", "mp": 4}, {"name": "Blizzard", "mp": 4}, {"name": "Thunder", "mp": 4}]:
+		black.add_item(spell.name, Action.CAST).metadata = spell
+	root.add_item("Items", Action.ITEMS).enabled = false
+	root.add_item("Run", Action.RUN)
 	return root
