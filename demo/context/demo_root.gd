@@ -45,6 +45,44 @@ func mount_settings() -> bool:
 	)
 
 
+func mount_skirmish_menu() -> bool:
+	var menu := DemoSkirmishMenu.new()
+	menu.choice_made.connect(_on_skirmish_choice)
+	menu.back_requested.connect(mount_main_menu)
+	return await replace_child(menu)
+
+
+## A finished match goes back to the main menu; an abandoned one goes back to
+## the skirmish menu.
+func mount_arena_rumble() -> bool:
+	var match_mode := DemoArenaRumble.new()
+	match_mode.completed.connect(mount_main_menu)
+	match_mode.aborted.connect(mount_skirmish_menu)
+	return await replace_child(
+		match_mode, func() -> void: match_mode.bind_dependencies(settings)
+	)
+
+
+func mount_barrel_chase() -> bool:
+	var match_mode := DemoBarrelChase.new()
+	match_mode.completed.connect(mount_main_menu)
+	match_mode.aborted.connect(mount_skirmish_menu)
+	# The root decides the parameters; here, more barrels on harder settings.
+	var barrels := 6 + 6 * settings.difficulty
+	return await replace_child(
+		match_mode,
+		func() -> void: match_mode.bind_dependencies(settings, barrels)
+	)
+
+
+func _on_skirmish_choice(choice: int) -> void:
+	match choice:
+		DemoSkirmishMenu.Choice.ARENA_RUMBLE:
+			mount_arena_rumble()
+		DemoSkirmishMenu.Choice.BARREL_CHASE:
+			mount_barrel_chase()
+
+
 func _on_mode_chosen(mode: int) -> void:
 	match mode:
 		DemoMainMenu.Mode.NEW_CAMPAIGN:
@@ -52,7 +90,7 @@ func _on_mode_chosen(mode: int) -> void:
 		DemoMainMenu.Mode.LOAD_SAVEGAME:
 			mount_mode("Load Savegame")
 		DemoMainMenu.Mode.SKIRMISH:
-			mount_mode("Skirmish")
+			mount_skirmish_menu()
 		DemoMainMenu.Mode.SETTINGS:
 			mount_settings()
 		DemoMainMenu.Mode.QUIT:

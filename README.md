@@ -29,7 +29,7 @@ godot --headless --path . --import
 
 The main scene shows the retro menu. Press **1** to **7** to switch between the default font, Press Start 2P, Silkscreen, Kenney Pixel, and the Apple II fonts Print Char 21 and PR Number 3, and the smooth programmer font Hack.
 
-The context demo (a splash screen that loads into a menu, then five modes) is a separate scene:
+The context demo (a splash screen that loads into a menu, then settings, placeholder modes, and a skirmish menu leading to two placeholder matches) is a separate scene:
 
 ```
 godot --path . res://demo/context/context_demo.tscn

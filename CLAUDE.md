@@ -59,7 +59,7 @@ Scoped contexts, based on Hovering Skull's pattern (<https://youtu.be/HkjOE4FbrX
 - `bind_dependencies()` is deliberately not declared on `Context`. Each subclass declares its own typed version, because GDScript rejects an override with a different signature. The parent calls it from the `bind` callable passed to `replace_child()`.
 - No service registry and no automatic injection: the parent passes dependencies explicitly.
 - `replace_child()` refuses an overlapping mount (logs an error, returns `false`) and returns `false` if the child was torn down during `setup()`. Tests for refusals use gdUnit4's `assert_error(...).is_push_error(...)`.
-- Demo: `demo/context/` (run with `res://demo/context/context_demo.tscn`). `DemoRoot` mounts `DemoSplash` (its `setup()` awaits a fake load), then `DemoMainMenu`, then a mode or settings screen. Tests in `test/test_context.gd` and `test/test_demo_context.gd`.
+- Demo: `demo/context/` (run with `res://demo/context/context_demo.tscn`). `DemoRoot` mounts `DemoSplash` (its `setup()` awaits a fake load), then `DemoMainMenu`, then a placeholder mode, the settings screen, or `DemoSkirmishMenu`. Skirmish leads to `DemoArenaRumble` or `DemoBarrelChase` (both extend `DemoMatchStub`): finishing a match (Enter/A) returns to the main menu, abandoning it (Esc/B) returns to the skirmish menu. Tests can drive the routing with a `DemoRoot` subclass that overrides `_ready()` to skip the splash. Tests in `test/test_context.gd` and `test/test_demo_context.gd`.
 
 ## Commands
 

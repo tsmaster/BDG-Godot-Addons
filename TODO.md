@@ -14,3 +14,9 @@
 - [ ] Consider a way to hold several child contexts at once. `replace_child()` manages a single slot; a context can hold more children by hand, and teardown already handles them, but there is no mounting helper for them.
 - [ ] Consider letting `tear_down()` be awaitable (for exit transitions). Only `setup()` may await today.
 - [ ] Test `bdg_context` under Godot 4.8-dev builds along with the rest.
+- [ ] Restructure the skirmish demo flow into lobby, match and results (today it has only a menu and a placeholder match, where Enter/A finishes and Esc/B abandons). Intended structure:
+  - **Lobby** (one per game mode, for example setting up an Arena Rumble): backing out returns to the skirmish menu. Starting the game moves on to the match.
+  - **Match:** once committed, the meaningful choices are to resign or to play to the end. There is no back-out to the skirmish menu.
+  - **Results screen:** reached both by resigning and by completing the match, whether won or lost. It is the only way out of a match, and it leads back to the main menu.
+  - Sketch of the flow: main menu, skirmish menu, lobby, match, results, main menu (with lobby back to skirmish menu as the only early exit).
+  - Design notes: the results context needs the outcome passed in through its own `bind_dependencies()`, for example an outcome enum (`WON`, `LOST`, `RESIGNED`) plus any scores, so it is a good test of per-context signatures. Decide whether the lobby and match are separate sibling contexts mounted in turn by the root, or the lobby is the parent that mounts the match as its child, which fits the scoped-context idea (the lobby's settings would naturally be shared with the match).
