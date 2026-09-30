@@ -95,6 +95,10 @@ func current_item() -> RetroMenuItem:
 func _gui_input(event: InputEvent) -> void:
 	if _panels.is_empty():
 		return
+	# Hold on to the viewport: acting on the event may remove this menu from
+	# the tree (a listener can mount a new screen), and accept_event() does
+	# nothing once the node is outside the tree.
+	var viewport := get_viewport()
 	if event is InputEventMouseMotion:
 		var index := _cell_at(event.position)
 		if index >= 0:
@@ -121,7 +125,7 @@ func _gui_input(event: InputEvent) -> void:
 		back()
 	else:
 		return
-	accept_event()
+	viewport.set_input_as_handled()
 
 
 func _handle_mouse_button(event: InputEventMouseButton) -> void:
@@ -139,7 +143,6 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 			_scroll(-1)
 		MOUSE_BUTTON_WHEEL_DOWN:
 			_scroll(1)
-	accept_event()
 
 
 func _move_cursor(dx: int, dy: int) -> void:

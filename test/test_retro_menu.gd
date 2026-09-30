@@ -11,6 +11,17 @@ var moved: Array[RetroMenuItem]
 var closed_count: int
 
 
+## Counts ui_accept events that reach the unhandled-input stage.
+class UnhandledCounter:
+	extends Node
+
+	var count := 0
+
+	func _unhandled_input(event: InputEvent) -> void:
+		if event.is_action_pressed(&"ui_accept"):
+			count += 1
+
+
 func before_test() -> void:
 	activated = []
 	toggled = []
@@ -249,3 +260,18 @@ func test_right_does_not_select_a_radio() -> void:
 	_press(&"ui_right")
 	assert_bool(hard.checked).is_false()
 	assert_int(toggled.size()).is_equal(0)
+
+
+func test_event_is_handled_even_if_the_menu_leaves_the_tree_while_acting(
+) -> void:
+	var counter: UnhandledCounter = auto_free(UnhandledCounter.new())
+	add_child(counter)
+	# A listener that replaces the screen removes the menu from the tree.
+	menu.item_activated.connect(
+		func(_item: RetroMenuItem) -> void: remove_child(menu)
+	)
+	menu.open(_simple_root())
+	_press(&"ui_accept")
+	assert_int(activated.size()).is_equal(1)
+	assert_int(counter.count).is_equal(0)
+	menu.free()  # it is outside the tree, so nothing else will free it
