@@ -2,7 +2,17 @@ class_name RetroMenuItem
 extends Resource
 ## One entry in a RetroMenu. An item with children is a submenu.
 
+enum Type {
+	## Choosing it emits item_activated (or opens its children, if it has any).
+	ACTION,
+	## Choosing it flips `checked` and emits item_toggled. The menu stays open.
+	CHECKBOX,
+}
+
 @export var text := ""
+@export var type := Type.ACTION
+## State of a CHECKBOX item. Read it any time, or set it before opening the menu.
+@export var checked := false
 ## Identifies the item in the item_activated signal. An enum member from your own
 ## game works well: enum values are ints, so `add_item("Attack", Action.ATTACK)`
 ## can be matched later with `match item.id: Action.ATTACK: ...`.
@@ -32,6 +42,14 @@ func is_submenu() -> bool:
 func add_item(p_text: String, p_id := -1) -> RetroMenuItem:
 	var item := RetroMenuItem.new(p_text, p_id)
 	children.append(item)
+	return item
+
+
+## Appends a checkbox child and returns it.
+func add_checkbox(p_text: String, p_checked := false, p_id := -1) -> RetroMenuItem:
+	var item := add_item(p_text, p_id)
+	item.type = Type.CHECKBOX
+	item.checked = p_checked
 	return item
 
 

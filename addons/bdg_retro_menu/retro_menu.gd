@@ -16,6 +16,8 @@ extends Control
 
 ## Emitted when a leaf item is chosen.
 signal item_activated(item: RetroMenuItem)
+## Emitted when a checkbox item is toggled. The menu stays open; read item.checked.
+signal item_toggled(item: RetroMenuItem)
 ## Emitted whenever the highlighted item changes.
 signal cursor_moved(item: RetroMenuItem)
 ## Emitted after the menu closes, whether by choosing an item or backing out.
@@ -23,6 +25,8 @@ signal closed
 
 const THEME_TYPE := &"RetroMenu"
 const ARROW_WIDTH := 10.0
+const CHECKBOX_OFF := "[ ] "
+const CHECKBOX_ON := "[x] "
 
 ## Where the first panel's top-left corner sits, in this control's local space.
 @export var panel_origin := Vector2(16, 16)
@@ -105,7 +109,7 @@ func _gui_input(event: InputEvent) -> void:
 		if _columns(_panels.back()) > 1:
 			_move_cursor(1, 0)
 		else:
-			_activate_current()
+			_activate_current(true)
 	elif event.is_action_pressed(&"ui_accept"):
 		_activate_current()
 	elif event.is_action_pressed(&"ui_cancel"):
@@ -174,11 +178,18 @@ func _scroll_to_cursor(panel: Dictionary) -> void:
 		panel.top_row = row - visible_rows + 1
 
 
-func _activate_current() -> void:
+## `from_right` is true when triggered by ui_right, which opens submenus and
+## activates plain items but never flips a checkbox.
+func _activate_current(from_right := false) -> void:
 	var item := current_item()
 	if item == null or not item.enabled:
 		return
-	if item.is_submenu():
+	if item.type == RetroMenuItem.Type.CHECKBOX:
+		if not from_right:
+			item.checked = not item.checked
+			queue_redraw()
+			item_toggled.emit(item)
+	elif item.is_submenu():
 		_push_panel(item)
 		queue_redraw()
 	else:
@@ -219,10 +230,11 @@ func _layout(panel_index: int) -> Dictionary:
 	var font := _font()
 	var font_size := _font_size()
 	var pad := get_theme_constant(&"item_padding", THEME_TYPE) if has_theme_constant(&"item_padding", THEME_TYPE) else 4
+	var indicator_width := _indicator_width(panel.item, font, font_size)
 	var widest := 0.0
 	for child: RetroMenuItem in panel.item.children:
 		widest = maxf(widest, font.get_string_size(child.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
-	var cell := Vector2(widest + pad * 2 + ARROW_WIDTH, font.get_height(font_size) + pad * 2)
+	var cell := Vector2(indicator_width + widest + pad * 2 + ARROW_WIDTH, font.get_height(font_size) + pad * 2)
 	var style := _panel_style()
 	var border := Vector2(style.get_margin(SIDE_LEFT), style.get_margin(SIDE_TOP))
 	var content := Vector2(_columns(panel) * cell.x, _visible_rows(panel) * cell.y)
@@ -232,7 +244,19 @@ func _layout(panel_index: int) -> Dictionary:
 		"content_origin": origin + border,
 		"cell": cell,
 		"pad": pad,
+		"indicator_width": indicator_width,
 	}
+
+
+## Room reserved before the text of every row when any child is a checkbox, so
+## the labels line up. It fits the wider of "[ ] " and "[x] ".
+func _indicator_width(item: RetroMenuItem, font: Font, font_size: int) -> float:
+	for child: RetroMenuItem in item.children:
+		if child.type == RetroMenuItem.Type.CHECKBOX:
+			return maxf(
+				font.get_string_size(CHECKBOX_OFF, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x,
+				font.get_string_size(CHECKBOX_ON, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
+	return 0.0
 
 
 func _top_rect() -> Rect2:
@@ -285,6 +309,10 @@ func _draw_panel(panel_index: int, is_top: bool) -> void:
 					draw_rect(Rect2(cell_pos, layout.cell), Color(0, 0, 0, 0.35))
 			var color := _color(&"font_color" if child.enabled else &"font_disabled_color")
 			var baseline := cell_pos + Vector2(layout.pad, layout.pad + font.get_ascent(font_size))
+			if child.type == RetroMenuItem.Type.CHECKBOX:
+				var indicator := CHECKBOX_ON if child.checked else CHECKBOX_OFF
+				draw_string(font, baseline, indicator, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+			baseline.x += layout.indicator_width
 			draw_string(font, baseline, child.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
 			if child.is_submenu():
 				_draw_arrow(cell_pos + Vector2(layout.cell.x - ARROW_WIDTH, layout.cell.y * 0.5), Vector2.RIGHT)

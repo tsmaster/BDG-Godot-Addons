@@ -1,7 +1,7 @@
 extends Control
 
 ## Ids for the menu items. The menu itself only sees ints.
-enum Action { ATTACK, DEFEND, CAST, ITEMS, RUN }
+enum Action { ATTACK, DEFEND, CAST, ITEMS, RUN, MUSIC, SOUND, FULLSCREEN }
 
 ## Font choices for comparison. Pixel fonts look sharpest at multiples of their design size.
 const FONTS := [
@@ -16,6 +16,7 @@ const FONTS := [
 
 var _menu: RetroMenu
 var _label: Label
+var _root: RetroMenuItem  # built once, so checkbox state survives closing and reopening
 
 
 func _ready() -> void:
@@ -31,10 +32,13 @@ func _ready() -> void:
 	add_child(_menu)
 	_menu.item_activated.connect(func(item: RetroMenuItem) -> void:
 		_on_item_activated(item))
+	_menu.item_toggled.connect(func(item: RetroMenuItem) -> void:
+		_label.text = "%s is now %s" % [item.text, "on" if item.checked else "off"])
 	_menu.closed.connect(func() -> void: _label.text += "  [closed - press Enter to reopen]")
 
 	_menu.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_menu.open(_build_menu())
+	_root = _build_menu()
+	_menu.open(_root)
 
 
 func _on_item_activated(item: RetroMenuItem) -> void:
@@ -82,7 +86,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				_apply_font(choice)
 				return
 	if event.is_action_pressed(&"ui_accept") and not _menu.is_open():
-		_menu.open(_build_menu())
+		_menu.open(_root)
 		get_viewport().set_input_as_handled()
 
 
@@ -103,5 +107,9 @@ func _build_menu() -> RetroMenuItem:
 	for spell in [{"name": "Fire", "mp": 4}, {"name": "Blizzard", "mp": 4}, {"name": "Thunder", "mp": 4}]:
 		black.add_item(spell.name, Action.CAST).metadata = spell
 	root.add_item("Items", Action.ITEMS).enabled = false
+	var settings := root.add_submenu("Settings")
+	settings.add_checkbox("Music", true, Action.MUSIC)
+	settings.add_checkbox("Sound effects", true, Action.SOUND)
+	settings.add_checkbox("Fullscreen", false, Action.FULLSCREEN)
 	root.add_item("Run", Action.RUN)
 	return root

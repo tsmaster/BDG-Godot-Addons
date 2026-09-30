@@ -41,6 +41,7 @@ func _on_item(item: RetroMenuItem) -> void:
 
 - **`id`** is an `int`. Use an enum from your own game so typos are caught when the script is parsed. The value comes back as an `int`, so cast it (`item.id as Action`) if you want the enum type.
 - **`metadata`** is a `Variant` that the menu never touches. It is handy for menus built from data, such as spells or inventory.
+- **Checkboxes:** `add_checkbox("Music", true, Action.MUSIC)` adds an item drawn as `[x]` or `[ ]` before its text. Choosing it (`ui_accept` or click) flips `item.checked` and emits `item_toggled(item)`. The menu stays open, whatever `close_on_activate` is. `ui_right` never toggles a checkbox. Read or set `checked` on the item at any time. Keep the same item tree between openings if you want the state to persist.
 - Other signals: `cursor_moved(item)` when the highlight changes, and `closed` when the menu closes.
 - If you want strong typing for the extra data, subclass `RetroMenuItem` and append your own instances to `children`.
 
